@@ -99,42 +99,68 @@
 // ● Crear una función generarAsteriscos(n) que reciba un número y
 // retorne un string con esa cantidad de asteriscos (ej:
 // generarAsteriscos(5) → "*****"). Usar un bucle for.
-promedio = 0;
-sumaTotal = 0;
-const numeros = [7, 1, 19, 4, 6, 17, 22, 80];
-for (let i = 0; i < numeros.length; i++) {
-    console.log(numeros[i]);
-    sumaTotal += numeros[i];
-    promedio = sumaTotal / numeros.length;
 
-}
-console.log(`La suma total es: ${sumaTotal}`);
-console.log(`El promedio es: ${promedio}`);
 
-let numeroMayor = numeros[0];
-let numeroMenor = numeros[0];
+// promedio = 0;
+// sumaTotal = 0;
+// const numeros = [7, 1, 19, 4, 6, 17, 22, 80];
+// for (let i = 0; i < numeros.length; i++) {
+//     console.log(numeros[i]);
+//     sumaTotal += numeros[i];
+//     promedio = sumaTotal / numeros.length;
 
-for (let i = 1; i < numeros.length; i++) {
-    if (numeros[i] > numeroMayor) {
-        numeroMayor = numeros[i];
+// }
+// console.log(`La suma total es: ${sumaTotal}`);
+// console.log(`El promedio es: ${promedio}`);
+
+// let numeroMayor = numeros[0];
+// let numeroMenor = numeros[0];
+
+// for (let i = 1; i < numeros.length; i++) {
+//     if (numeros[i] > numeroMayor) {
+//         numeroMayor = numeros[i];
+//     }
+
+//     if (numeros[i] < numeroMenor) {
+//         numeroMenor = numeros[i];
+//     }
+// }
+
+// console.log(`El número mayor es: ${numeroMayor}`);
+// console.log(`El número menor es: ${numeroMenor}`);
+
+// function generarAsteriscos(n) {
+//     let asteriscos = "";
+//     for (let i = 0; i < n; i++) {
+//         asteriscos += "*";
+//     }
+//     return asteriscos;
+// }
+
+// console.log(generarAsteriscos(5));
+// console.log(generarAsteriscos(4));
+// console.log(generarAsteriscos(12));
+
+
+// ● Crear un HTML con un <input type="number"> y un <button> 
+// "Generar"
+// ● Al hacer click, leer el número del input y generar un "medio
+// árbol" de asteriscos de esa altura.
+
+function generarArbol() {
+    const altura = document.getElementById("altura").value;
+    const resultado = document.getElementById("resultado");
+
+    if (altura === "" || altura < 1) {
+        resultado.textContent = "Error: número inválido";
+        return;
     }
 
-    if (numeros[i] < numeroMenor) {
-        numeroMenor = numeros[i];
+    let salida = "";
+
+    for (let i = 1; i <= altura; i++) {
+        salida += "*".repeat(i) + "\n"; 
     }
+
+    resultado.textContent = salida;
 }
-
-console.log(`El número mayor es: ${numeroMayor}`);
-console.log(`El número menor es: ${numeroMenor}`);
-
-function generarAsteriscos(n) {
-    let asteriscos = "";
-    for (let i = 0; i < n; i++) {
-        asteriscos += "*";
-    }
-    return asteriscos;
-}
-
-console.log(generarAsteriscos(5));
-console.log(generarAsteriscos(4));
-console.log(generarAsteriscos(12));
