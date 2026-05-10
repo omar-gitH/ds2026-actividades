@@ -48,3 +48,37 @@ const libros = [
         imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOFvNdHNmDXzZ1A5iwW_qCsGoYe910RbxL6sZvalNlHrUHiunnfTPdrk_O_4Y9NG2ZETzb1aXyHy-DaqkUIkB9uXvnPwnvYHKsCIJYq34&s=10"
     }
 ];
+
+const searchInput = document.getElementById('searchInput');
+const btnSearch = document.getElementById('btnSearch');
+const resultados = document.getElementById('resultados');
+
+btnSearch.addEventListener('click', () => {
+    const query = searchInput.value;
+    if (query) {
+        fetch(`https://openlibrary.org/search.json?title=${query}`)
+            .then(res => res.json())
+            .then(data => {
+                mostrarLibros(data.docs.slice(0, 10)); // Mostramos los primeros 10
+            });
+    }
+});
+
+function mostrarLibros(libros) {
+    resultados.innerHTML = '';
+    libros.forEach(libro => {
+        const cover = libro.cover_i ? `https://covers.openlibrary.org/b/id/${libro.cover_i}-M.jpg` : 'https://via.placeholder.com/150x200';
+        resultados.innerHTML += `
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="${cover}" class="card-img-top" alt="Portada">
+                    <div class="card-body">
+                        <h5>${libro.title}</h5>
+                        <p>${libro.author_name ? libro.author_name[0] : 'Autor desconocido'}</p>
+                        <a href="libro.html" class="btn btn-sm btn-outline-primary">Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+}
