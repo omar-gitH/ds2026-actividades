@@ -1,0 +1,12 @@
+{
+  "name": "c13-docker-backend",
+  "version": "1.0.0",
+  "description": "Backend API for c13-docker",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
