@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { Badge, Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { LibroCard } from '../components/LibroCard';
+import { useFetch } from '../hooks/useFetch';
 import type { Libro } from '../types/libro';
 
 export default function Catalogo({ libros }: { libros: Libro[] }) {
   const [query, setQuery] = useState('');
   const [librosGlobales, setLibrosGlobales] = useState<Libro[]>([]);
   const [buscando, setBuscando] = useState(false);
+
+  const { data: librosCargados, loading, error } = useFetch<Libro[]>('/libros.json');
+  const librosBase = librosCargados ?? libros;
 
   const buscarLibrosGlobales = async () => {
     const texto = query.trim();
@@ -44,10 +48,31 @@ export default function Catalogo({ libros }: { libros: Libro[] }) {
 
   const librosFiltrados = query.trim()
     ? librosGlobales
-    : libros.filter((libro) => {
+    : librosBase.filter((libro) => {
         const texto = `${libro.title} ${libro.author} ${libro.description ?? ''} ${libro.price ?? ''}`.toLowerCase();
         return texto.includes(query.toLowerCase());
       });
+
+  if (loading) {
+    return (
+      <Container className="my-5">
+        <div className="empty-state text-center py-5">
+          <h5>Cargando...</h5>
+        </div>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container className="my-5">
+        <div className="empty-state text-center py-5">
+          <h5>Error al cargar libros</h5>
+          <p className="text-muted">{error}</p>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container className="my-5">
