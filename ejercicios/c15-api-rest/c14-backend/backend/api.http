@@ -1,0 +1,84 @@
+@baseUrl = http://localhost:3000
+
+###
+
+GET {{baseUrl}}/api/libros
+
+###
+
+GET {{baseUrl}}/api/libros/1
+
+###
+
+GET {{baseUrl}}/api/libros/999
+
+###
+
+POST {{baseUrl}}/api/libros
+Content-Type: application/json
+
+{
+  "titulo": "Cien años de soledad",
+  "autor": "Gabriel García Márquez",
+  "precio": 4700,
+  "imagen": "https://example.com/cien-anos.jpg",
+  "disponible": true
+}
+
+###
+
+PUT {{baseUrl}}/api/libros/2
+Content-Type: application/json
+
+{
+  "titulo": "1984 - Edición actualizada",
+  "autor": "George Orwell",
+  "precio": 4600,
+  "imagen": "https://example.com/1984.jpg",
+  "disponible": false
+}
+
+###
+
+DELETE {{baseUrl}}/api/libros/3
+
+###
+
+GET {{baseUrl}}/api/autores
+
+###
+
+GET {{baseUrl}}/api/autores/1
+
+###
+
+GET {{baseUrl}}/api/autores/999
+
+###
+
+POST {{baseUrl}}/api/autores
+Content-Type: application/json
+
+{
+  "nombre": "Isabel Allende",
+  "nacionalidad": "Chile",
+  "nacidoEn": "1942-08-02",
+  "activo": true
+}
+
+###
+
+PUT {{baseUrl}}/api/autores/2
+Content-Type: application/json
+
+{
+  "nombre": "George Orwell",
+  "nacionalidad": "Reino Unido",
+  "nacidoEn": "1903-06-25",
+  "activo": false
+}
+
+###
+
+DELETE {{baseUrl}}/api/autores/4
+

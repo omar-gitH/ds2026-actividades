@@ -1,0 +1,10 @@
+export interface Libro {
+  id: number;
+  titulo: string;
+  autor: string;
+  precio: number;
+  imagen: string;
+  disponible: boolean;
+}
+
+export type LibroPayload = Omit<Libro, 'id'>;
