@@ -1,0 +1,33 @@
+services:
+  api:
+    build: ./backend
+    ports:
+      - "3000:3000"
+      - "5555:5555"
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/prisma:/app/prisma
+      - ./backend/prisma.config.ts:/app/prisma.config.ts
+    env_file:
+      - backend/.env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: sh -c "npm install && npx prisma generate --config prisma.config.ts && npx prisma db push --config prisma.config.ts && npx prisma db seed --config prisma.config.ts && npm run dev"
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    env_file:
+      - backend/.env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d$$POSTGRES_DB"]
+      interval: 5s
+      retries: 10
+      timeout: 5s
+      start_period: 5s
+volumes:
+  pgdata:
