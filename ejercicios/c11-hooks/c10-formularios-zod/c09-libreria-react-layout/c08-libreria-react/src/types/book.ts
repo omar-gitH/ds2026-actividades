@@ -1,1 +1,0 @@
-export type Book = { id: number; title: string; author: string; img: string; alt: string; description?: string; price?: string; };
