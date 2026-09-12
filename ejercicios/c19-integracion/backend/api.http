@@ -1,0 +1,258 @@
+@baseUrl = http://localhost:3000
+
+### Libros
+GET {{baseUrl}}/api/libros
+
+###
+GET {{baseUrl}}/api/libros/1
+
+###
+GET {{baseUrl}}/api/libros/999
+
+###
+POST {{baseUrl}}/api/libros
+Content-Type: application/json
+
+{
+  "titulo": "Cien años de soledad",
+  "precio": 4700,
+  "imagen": "https://example.com/cien-anos.jpg",
+  "disponible": true,
+  "autorId": 3
+}
+
+###
+PUT {{baseUrl}}/api/libros/1
+Content-Type: application/json
+
+{
+  "titulo": "Cien años de soledad - edición 2026",
+  "precio": 5000,
+  "imagen": "https://example.com/cien-anos.jpg",
+  "disponible": false,
+  "autorId": 3
+}
+
+###
+DELETE {{baseUrl}}/api/libros/999
+
+### Autores
+GET {{baseUrl}}/api/autores
+
+###
+GET {{baseUrl}}/api/autores/1
+
+###
+GET {{baseUrl}}/api/autores/999
+
+###
+POST {{baseUrl}}/api/autores
+Content-Type: application/json
+
+{
+  "nombre": "Isabel Allende",
+  "nacionalidad": "Chile"
+}
+
+###
+PUT {{baseUrl}}/api/autores/1
+Content-Type: application/json
+
+{
+  "nombre": "George Orwell",
+  "nacionalidad": "Reino Unido"
+}
+
+###
+DELETE {{baseUrl}}/api/autores/999
+
+### Errores esperados
+
+### 400 - sin título
+POST {{baseUrl}}/api/libros
+Content-Type: application/json
+
+{
+  "precio": 5000,
+  "imagen": "https://example.com/huérfano.jpg",
+  "autorId": 1
+}
+
+###
+### 400 - id inválido
+GET {{baseUrl}}/api/libros/abc
+
+###
+### 400 - el autor no existe (formato válido, dato imposible)
+POST {{baseUrl}}/api/libros
+Content-Type: application/json
+
+{
+  "titulo": "Huérfano",
+  "precio": 5000,
+  "imagen": "https://example.com/huérfano.jpg",
+  "autorId": 9999
+}
+
+###
+### 409 - autor duplicado
+POST {{baseUrl}}/api/autores
+Content-Type: application/json
+
+{
+  "nombre": "Gabriel García Márquez",
+  "nacionalidad": "Colombia"
+}
+
+###
+### 409 - borrar un autor con libros (onDelete: Restrict)
+DELETE {{baseUrl}}/api/autores/1
+
+###
+### 404 - actualizar algo que no existe
+PUT {{baseUrl}}/api/libros/9999
+Content-Type: application/json
+
+{
+  "titulo": "Libro inexistente",
+  "precio": 5000,
+  "imagen": "https://example.com/inexistente.jpg",
+  "autorId": 1
+}
+
+### ========================================
+### CASOS DE PRUEBA AUTENTICACIÓN (PASO 12)
+### ========================================
+
+### 1. POST /auth/registro -> 201 sin passwordHash
+POST {{baseUrl}}/api/auth/registro
+Content-Type: application/json
+
+{
+  "nombre": "Ana",
+  "email": "ana@libreria.test",
+  "password": "Password123"
+}
+
+###
+### 2. POST /auth/registro mismo email -> 409
+POST {{baseUrl}}/api/auth/registro
+Content-Type: application/json
+
+{
+  "nombre": "Ana Dos",
+  "email": "ana@libreria.test",
+  "password": "Password123"
+}
+
+###
+### 3. POST /auth/registro password "corta" -> 400 con 3 errores
+POST {{baseUrl}}/api/auth/registro
+Content-Type: application/json
+
+{
+  "nombre": "Pedro",
+  "email": "pedro@libreria.test",
+  "password": "corta"
+}
+
+###
+### 4. POST /auth/login mail que no existe -> 401 Credenciales inválidas
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "noexiste@libreria.test",
+  "password": "Password123"
+}
+
+###
+### 5. POST /auth/login password mal -> 401 Credenciales inválidas
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "ana@libreria.test",
+  "password": "MalPassword999"
+}
+
+###
+### 6. POST /auth/login correcto -> 200 con token
+# @name loginCliente
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "ana@libreria.test",
+  "password": "Password123"
+}
+
+### Guardar token CLIENTE
+@tokenCliente = {{loginCliente.response.body.$.token}}
+
+###
+### Login ADMIN (para usar después)
+# @name loginAdmin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@libreria.test",
+  "password": "Admin1234"
+}
+
+###
+### Guardar token ADMIN
+@tokenAdmin = {{loginAdmin.response.body.$.token}}
+
+###
+### 7. GET /auth/yo sin header -> 401
+GET {{baseUrl}}/api/auth/yo
+
+###
+### 8. GET /auth/yo con CLIENTE -> 200
+GET {{baseUrl}}/api/auth/yo
+Authorization: Bearer {{tokenCliente}}
+
+###
+### 9. POST /api/libros sin header -> 401
+POST {{baseUrl}}/api/libros
+Content-Type: application/json
+
+{
+  "titulo": "Libro hacker",
+  "precio": 1000,
+  "imagen": "http://example.com/hacker.jpg",
+  "autorId": 1
+}
+
+###
+### 10. POST /api/libros con CLIENTE -> 403
+POST {{baseUrl}}/api/libros
+Content-Type: application/json
+Authorization: Bearer {{tokenCliente}}
+
+{
+  "titulo": "Libro de cliente",
+  "precio": 1000,
+  "imagen": "http://example.com/cliente.jpg",
+  "autorId": 1
+}
+
+###
+### 11. POST /api/libros con ADMIN -> 201
+POST {{baseUrl}}/api/libros
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+{
+  "titulo": "Libro de admin",
+  "precio": 1000,
+  "imagen": "http://example.com/admin.jpg",
+  "autorId": 1
+}
+
+###
+### 12. GET /api/libros sin header -> 200 (es público)
+GET {{baseUrl}}/api/libros
+
