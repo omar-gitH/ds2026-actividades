@@ -1,3 +1,4 @@
+import { AuthProvider } from './context/AuthContext';
 import { useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Layout from './components/layout/Layout';
@@ -7,6 +8,10 @@ import Catalogo from './pages/Catalogo';
 import LibroDetalle from './pages/LibroDetalle';
 import Login from './pages/Login';
 import type { Libro } from './types/libro';
+
+// 1. Nuevas importaciones del Paso 3
+import PrivateRoute from './components/PrivateRoute';
+import SinPermiso from './pages/SinPermiso';
 
 const librosIniciales: Libro[] = [
   {
@@ -73,17 +78,27 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home libros={libros} />} />
-          <Route path="/catalogo" element={<Catalogo libros={libros} />} />
-          <Route path="/libros/:id" element={<LibroDetalle libros={libros} />} />
-          <Route path="/libros/nuevo" element={<LibroNuevo onAgregar={agregarLibro} />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home libros={libros} />} />
+            <Route path="/catalogo" element={<Catalogo libros={libros} />} />
+            <Route path="/libros/:id" element={<LibroDetalle libros={libros} />} />
+            <Route path="/login" element={<Login />} />
+            
+            {/* 2. Ruta pública para accesos denegados */}
+            <Route path="/sin-permiso" element={<SinPermiso />} />
+
+            {/* 3. Ruta protegida con PrivateRoute exigiendo rol ADMIN */}
+            <Route element={<PrivateRoute rol="ADMIN" />}>
+              <Route path="/libros/nuevo" element={<LibroNuevo onAgregar={agregarLibro} />} />
+            </Route>
+            
+          </Routes>
+        </Layout>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
