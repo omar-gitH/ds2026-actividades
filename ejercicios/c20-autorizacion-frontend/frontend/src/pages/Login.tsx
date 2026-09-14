@@ -1,25 +1,20 @@
+import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Container, Form, Alert } from 'react-bootstrap';
 import { loginSchema, type LoginFormValues } from '../schemas/loginSchema';
-import { apiFetch } from '../services/api';
-import { guardarToken } from '../services/sesion';
 
-type Sesion = {
-  token: string;
-  usuario: {
-    id: number;
-    email: string;
-    nombre: string;
-    rol: string;
-  };
-};
+// ❌ Se eliminaron las importaciones de apiFetch y guardarToken
+// ❌ Se eliminó la interfaz Sesion local
 
 export default function Login() {
   const navigate = useNavigate();
   const [errorGlobal, setErrorGlobal] = useState<string | null>(null);
+
+  // ✅ Extraemos la función login del contexto global
+  const { login } = useAuth();
 
   const {
     register,
@@ -32,14 +27,13 @@ export default function Login() {
   const onSubmit = async (datos: LoginFormValues) => {
     try {
       setErrorGlobal(null);
-      const sesion = await apiFetch<Sesion>('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify(datos),
-      });
-      guardarToken(sesion.token);
+      
+      // ✅ Pasamos los datos directamente al Provider, que se encarga del fetch y de guardar el token
+      await login(datos); 
+      
       navigate('/catalogo');
     } catch (err: any) {
-      setErrorGlobal(err.message || 'Error al iniciar sesión');
+      setErrorGlobal(err.message || 'Credenciales inválidas');
     }
   };
 
@@ -79,4 +73,3 @@ export default function Login() {
     </Container>
   );
 }
-
