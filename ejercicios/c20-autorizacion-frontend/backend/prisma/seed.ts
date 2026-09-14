@@ -39,15 +39,35 @@ const usuarios = [
 ];
 
 async function main() {
+  // Create autores
   await prisma.autor.createMany({ data: autores, skipDuplicates: true });
-  await prisma.categoria.createMany({ data: categorias, skipDuplicates: true });
-  for (const { autor, cats, ...datos } of libros) {
-    await prisma.libro.upsert({
-      where: { titulo: datos.titulo }, // Assuming titulo is unique, but it's not uniquely constrained in DB. Wait... let's just clear the books first.
 
+  // Create categorias
+  await prisma.categoria.createMany({ data: categorias, skipDuplicates: true });
+
+  // Create libros with author relationship
+  for (const { autor: autorNombre, cats, precio, imagen, disponible, titulo } of libros) {
+    const autorRecord = await prisma.autor.findUnique({
+      where: { nombre: autorNombre }
+    });
+
+    if (autorRecord) {
+      await prisma.libro.create({
+        data: {
+          titulo,
+          precio,
+          imagen,
+          disponible,
+          autorId: autorRecord.id,
+        }
+      });
+    }
+  }
+
+  // Create usuarios
   for (const { password, ...datos } of usuarios) {
     await prisma.usuario.upsert({
-      where:  { email: datos.email },
+      where: { email: datos.email },
       update: {},
       create: { ...datos, passwordHash: await bcrypt.hash(password, 10) },
     });
